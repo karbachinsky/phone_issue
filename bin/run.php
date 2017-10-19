@@ -54,10 +54,8 @@ function main()
         die("Failed to execute preapre statement\n");
     }
 
-    $clientOrders = array();
-
     foreach ($phones as $phone) {
-        # FIXME: mem copy here, php
+        # FIXME: possible memory copy here, should chec how it works in php
         $phone = ltrim($phone, "8");
         if (!$stmt->bind_param("s", $phone)) {
             die(sprintf("Failed to execute query with phone: %s\n", $phone));
