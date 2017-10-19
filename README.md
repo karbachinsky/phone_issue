@@ -25,7 +25,7 @@ http://repetitors.info/job/?programmer2
 
 Оформим детектор в отдельный переиспользуемый класс и покроем его тестами.
 
-См. файлы: `lib/phone.class.php` и `tests/phone.class.php`
+См. файлы: `lib/phone.class.php` и `tests/phone.class.test.php`
 
 
 ### 2. База
