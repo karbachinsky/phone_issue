@@ -1,0 +1,34 @@
+CREATE DATABASE issue
+  DEFAULT CHARACTER SET utf8
+  DEFAULT COLLATE utf8_general_ci;
+
+USE issue;
+
+CREATE TABLE `client` (
+  `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+
+CREATE TABLE `phone` (
+  `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
+  `number` CHAR(10) NOT NULL,
+  `client_id` INTEGER NOT NULL,
+  PRIMARY KEY (`id`)
+);
+
+ALTER TABLE `phone` ADD FOREIGN KEY (client_id) REFERENCES `client` (`id`);
+
+
+CREATE TABLE `order` (
+  `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
+  `client_id` INTEGER NOT NULL,
+  PRIMARY KEY (`id`)
+);
+
+
+ALTER TABLE `order` ADD FOREIGN KEY (client_id) REFERENCES `client` (`id`);
+
+
+
+CREATE UNIQUE INDEX idx_number ON phone (number) USING HASH;
