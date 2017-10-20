@@ -36,46 +36,46 @@ class PhoneExtractor {
     public function extract(string $input) {
         $phones = [];
 
-        $cur_digits = array();
+        $curDigits = array();
 
         $l = strlen($input);
         for ($i = 0; $i < $l; $i++){
             $symbol = $input[$i];
 
-            if ($this->_is_digit($symbol)) {
-                $cur_digits[] = $symbol;
+            if ($this->isDigit($symbol)) {
+                $curDigits[] = $symbol;
 
-                $len = count($cur_digits);
+                $len = count($curDigits);
 
-                $is_next_char_digit = $i < $l-1 && $this->_is_digit($input[$i+1]);
-                $is_next_char_special = $i < $l-1 && $this->_is_valid_inside_phone($input[$i+1]);
+                $isNextCharDigit = $i < $l-1 && $this->isDigit($input[$i+1]);
+                $isNextCharSpecial = $i < $l-1 && $this->isValidInsidePhone($input[$i+1]);
 
-                $is_next_char_valid_inside_phone = $is_next_char_digit || $is_next_char_special;
+                $isNextCharValidInsidePhone = $isNextCharDigit || $isNextCharSpecial;
 
                 $phone = NULL;
 
-                if ($len == 7 && !$is_next_char_valid_inside_phone) {
-                    $phone = "8". $this::DEFAULT_CITY_PREFIX . "" . join("", $cur_digits);
+                if ($len == 7 && !$isNextCharValidInsidePhone) {
+                    $phone = "8". $this::DEFAULT_CITY_PREFIX . "" . join("", $curDigits);
                 }
 
                 elseif ($len == 11) {
-                    if ($cur_digits[0] == "7") {
-                        $cur_digits[0] = "8";
+                    if ($curDigits[0] == "7") {
+                        $curDigits[0] = "8";
                     }
-                    $phone = join("", $cur_digits);
+                    $phone = join("", $curDigits);
                 }
-                elseif ($len == 10 && $cur_digits[0] != "8") {
-                    if ($cur_digits[0] == "7" && $is_next_char_digit) {
+                elseif ($len == 10 && $curDigits[0] != "8") {
+                    if ($curDigits[0] == "7" && $isNextCharDigit) {
                         // 7 is a beginig of the number without +
                         continue;
                     }
 
-                    $phone = "8" . join("", $cur_digits);
+                    $phone = "8" . join("", $curDigits);
                 }
 
                 if ($phone) {
-                    $cur_digits = array();
-                    if ($is_next_char_digit) {
+                    $curDigits = array();
+                    if ($isNextCharDigit) {
                         // this is trash, we have digits more
                         continue;
                     }
@@ -85,7 +85,7 @@ class PhoneExtractor {
                 continue;
             }
 
-            if ($this->_is_valid_inside_phone($symbol))
+            if ($this->isValidInsidePhone($symbol))
                 // Ok. inside a phone
                 continue;
 
@@ -96,11 +96,11 @@ class PhoneExtractor {
         return $phones;
     }
 
-    private function _is_digit($symbol) {
+    private function isDigit($symbol) {
         return array_key_exists($symbol, $this::DIGITS);
     }
 
-    private function _is_valid_inside_phone($symbol) {
+    private function isValidInsidePhone($symbol) {
         return array_key_exists($symbol, $this::VALID_SYMBOLS);
     }
 }
