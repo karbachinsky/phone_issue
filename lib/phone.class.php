@@ -4,7 +4,6 @@
 class PhoneExtractor {
     // TODO: use php7 ds extension for Set
     const DIGITS = array(
-      "+" => true,
       "0" => true,
       "1" => true,
       "2" => true,
@@ -26,6 +25,9 @@ class PhoneExtractor {
        "\t" => true,
     );
 
+    const PLUS = '+';
+    const DEFAULT_CITY_PREFIX = "495";
+
     /**
      * Extract phones from raw string
      * @param string $input
@@ -40,26 +42,31 @@ class PhoneExtractor {
         for ($i = 0; $i < $l; $i++){
             $symbol = $input[$i];
 
-            if (array_key_exists($symbol, $this::DIGITS)) {
+            if ($this->_is_digit($symbol)) {
                 $cur_digits[] = $symbol;
 
                 $len = count($cur_digits);
 
-                $is_next_char_digit = $i < $l-1 && array_key_exists($input[$i+1], $this::DIGITS);
+                $is_next_char_digit = $i < $l-1 && $this->_is_digit($input[$i+1]);
+                $is_next_char_special = $i < $l-1 && $this->_is_valid_inside_phone($input[$i+1]);
+
+                $is_next_char_valid_inside_phone = $is_next_char_digit || $is_next_char_special;
+
                 $phone = NULL;
 
-                // +7 ?
-                if ($len == 12) {
-                    # FIXME: array_slice is not optimal
-                    $phone = "8" . join("", array_slice($cur_digits, 2) );
+                if ($len == 7 && !$is_next_char_valid_inside_phone) {
+                    $phone = "8". $this::DEFAULT_CITY_PREFIX . "" . join("", $cur_digits);
                 }
-                elseif ($len == 11 && $cur_digits[0] != "+") {
+
+                elseif ($len == 11) {
+                    if ($cur_digits[0] == "7") {
+                        $cur_digits[0] = "8";
+                    }
                     $phone = join("", $cur_digits);
                 }
-                elseif ($len == 10 && $cur_digits[0] != "+" && $cur_digits[0] != "8") {
+                elseif ($len == 10 && $cur_digits[0] != "8") {
                     if ($cur_digits[0] == "7" && $is_next_char_digit) {
                         // 7 is a beginig of the number without +
-                        array_unshift($cur_digits, "+");
                         continue;
                     }
 
@@ -78,7 +85,7 @@ class PhoneExtractor {
                 continue;
             }
 
-            if (array_key_exists($symbol, $this::VALID_SYMBOLS))
+            if ($this->_is_valid_inside_phone($symbol))
                 // Ok. inside a phone
                 continue;
 
@@ -87,8 +94,14 @@ class PhoneExtractor {
         }
 
         return $phones;
-
     }
 
+    private function _is_digit($symbol) {
+        return array_key_exists($symbol, $this::DIGITS);
+    }
+
+    private function _is_valid_inside_phone($symbol) {
+        return array_key_exists($symbol, $this::VALID_SYMBOLS);
+    }
 }
 

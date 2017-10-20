@@ -35,10 +35,20 @@ class PhoneExtractorTest extends TestCase
             ""                        => [],
             " "                       => [],
             # Can't consider it as a phone. Better to ask input again
-            "8 903 abc 1234567"       => [],
+            "8 903 abc 123456"       => [],
 
             # No leading +
             "7 119 421-68-67"         => ["81194216867"],
+
+            "1+++++++++"              => [],
+
+            # Direct Number without city code
+            "1111111"                 => ["84951111111"],
+            "123-45-67"               => ["84951234567"],
+
+            // This is very special case when person copied only part of the number.
+            // Let's think that this is direct number for this moment
+            "My number is 8495123"    => ["84958495123"],
 
             // Multiple phones cases
             "89031234567 89051234567" => ["89031234567", "89051234567"],
@@ -47,6 +57,7 @@ class PhoneExtractorTest extends TestCase
         );
 
         $phoneExtractor = new PhoneExtractor();
+
 
         foreach ($samples as $sample => $expectedPhones) {
             $phones = $phoneExtractor->extract($sample);
